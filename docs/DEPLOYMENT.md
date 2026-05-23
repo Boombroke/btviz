@@ -21,12 +21,12 @@ btviz 是 Tauri 2 应用，前端走 WebView，因此目标机器需要 **WebKit
 | Fedora 39+ / RHEL 9+ | `webkit2gtk4.1 gtk3 librsvg2 libappindicator-gtk3 zeromq` | `gcc gcc-c++ make pkgconf-pkg-config webkit2gtk4.1-devel gtk3-devel openssl-devel libappindicator-gtk3-devel librsvg2-devel zeromq-devel` |
 | Arch / Manjaro | `webkit2gtk-4.1 gtk3 librsvg libappindicator-gtk3 zeromq` | `base-devel webkit2gtk-4.1 gtk3 librsvg libappindicator-gtk3 openssl pkgconf zeromq` |
 
-> Ubuntu 22.04 注意：upstream Tauri 2 锁定 `webkit2gtk-4.1`，22.04 默认仓库只到 4.0。可加 PPA 或直接升级到 24.04。`scripts/install.sh` 在检测到 22.04 时会拒绝继续并打印提示。
+> Ubuntu 22.04 注意：upstream Tauri 2 锁定 `webkit2gtk-4.1`，22.04 默认仓库只到 4.0。可加 PPA 或直接升级到 24.04。`scripts/install.sh` 在检测到 22.04 时会让你确认后再继续。
 
-Rust / Node 由脚本通过 rustup / nodesource 自动装；手动安装时：
+Rust / Node 由脚本通过 rustup / nodesource 自动装；手动安装的话：
 
 ```bash
-# Rust toolchain
+# Rust 工具链
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 
 # Node.js 20 (NodeSource)
@@ -38,9 +38,9 @@ sudo apt install -y nodejs
 
 ## 1. 终端用户：装预构建包
 
-`npm run tauri:build` 在 `target/release/bundle/` 下产出三种格式（详见 [README](../README.md#install)）。在用户机器上：
+`npm run tauri:build` 在 `target/release/bundle/` 下产出三种格式（详见 [README](../README.md#安装)）。在用户机器上：
 
-### `.deb` (Ubuntu / Debian)
+### `.deb`（Ubuntu / Debian）
 
 ```bash
 sudo apt install -y ./btviz_0.1.0_amd64.deb
@@ -49,14 +49,14 @@ btviz   # 启动
 
 依赖会被 apt 自动解析。卸载：`sudo apt remove btviz`。
 
-### `.rpm` (Fedora / RHEL)
+### `.rpm`（Fedora / RHEL）
 
 ```bash
 sudo dnf install -y ./btviz-0.1.0-1.x86_64.rpm
 btviz
 ```
 
-### `.AppImage` (任意发行版)
+### `.AppImage`（任意发行版）
 
 `AppImage` 自带 webkit / gtk 运行时（约 75 MB），免装系统依赖：
 
@@ -65,7 +65,7 @@ chmod +x btviz_0.1.0_amd64.AppImage
 ./btviz_0.1.0_amd64.AppImage
 ```
 
-放到 `~/Applications/` 并配合 [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) 即可加入系统菜单。
+放到 `~/Applications/` 配合 [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher) 即可加进系统菜单。
 
 ---
 
@@ -76,25 +76,26 @@ chmod +x btviz_0.1.0_amd64.AppImage
 ```bash
 git clone https://github.com/Boombroke/btviz.git
 cd btviz
-./scripts/install.sh build      # 自动装系统依赖 + Rust + Node + 编译 + 安装到 /usr/local/bin
+./scripts/install.sh build      # 自动装系统依赖 + Rust + Node + 编译 + 装到 /usr/local/bin
 ```
 
-`install.sh` 子命令：
+`install.sh` 子命令一览：
 
 | 子命令 | 行为 |
 |---|---|
 | `deps` | 仅安装系统依赖（apt / dnf / pacman 自动检测） |
 | `build` | 装依赖 + 编出 `btviz` 二进制 + 安装到 `/usr/local/bin/btviz`（默认） |
-| `bundle` | 装依赖 + `npm run tauri:build` 产出 `.deb` / `.rpm` / `.AppImage` 三件套到 `target/release/bundle/` |
+| `bundle` | 装依赖 + `npm run tauri:build` 产出 `.deb` / `.rpm` / `.AppImage` |
 | `dev` | 装依赖 + `npm install` + 启动 `npm run tauri:dev` 开发模式 |
-| `uninstall` | 删除 `/usr/local/bin/btviz` 与 `~/.local/share/applications/btviz.desktop` |
+| `uninstall` | 删除 `/usr/local/bin/btviz` 和 `~/.local/share/applications/btviz.desktop` |
 
-环境变量：
+环境变量旋钮：
 
-- `INSTALL_PREFIX=/opt/btviz` 改安装路径
-- `SKIP_RUST=1` 已有 Rust 工具链时跳过 rustup
-- `SKIP_NODE=1` 已有 Node.js 时跳过 nodesource
-- `RELEASE_PROFILE=debug` 编 debug 版（默认 release）
+- `INSTALL_PREFIX=/opt/btviz` — 改安装路径
+- `SKIP_RUST=1` — 已有 Rust 工具链时跳过 rustup
+- `SKIP_NODE=1` — 已有 Node.js 时跳过 nodesource
+- `RELEASE_PROFILE=debug` — 编 debug 版（默认 release）
+- `ASSUME_YES=1` — 无人值守，跳过确认提示（CI 用）
 
 ### 2.2 手工步骤
 
@@ -105,7 +106,7 @@ sudo apt install -y build-essential pkg-config curl ca-certificates \
     libwebkit2gtk-4.1-dev libgtk-3-dev libssl-dev \
     libayatana-appindicator3-dev librsvg2-dev libzmq3-dev
 
-# 2. 装 Rust（脚本式，无 sudo）
+# 2. 装 Rust（脚本式，不需要 sudo）
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 . "$HOME/.cargo/env"
 
@@ -137,9 +138,10 @@ npm install && npm run tauri:dev
 ```
 
 开发模式下：
-- 前端 Vite dev server 跑在 `http://localhost:1420`，热重载所有 TSX / CSS。
-- 后端 Rust 改动后 Tauri 自动重启窗口。
-- 调试日志：`RUST_LOG=debug npm run tauri:dev`。
+
+- 前端 Vite dev server 跑在 `http://localhost:1420`，TSX / CSS 全部热重载
+- 后端 Rust 改动后 Tauri 自动重启窗口
+- 调试日志：`RUST_LOG=debug npm run tauri:dev`
 
 ---
 
@@ -147,7 +149,7 @@ npm install && npm run tauri:dev
 
 ```bash
 # 二进制能跑：
-btviz --help            # 当前没有 CLI 参数，会直接启动 GUI
+btviz --help            # 当前没 CLI 参数，会直接拉 GUI
 which btviz
 
 # 跑一个 BT.CPP 4.x 服务端验证连接
@@ -164,11 +166,11 @@ ros2 launch sentry_behavior sentry_behavior_launch.py target_tree:=a
 
 ### 5.1 `error while loading shared libraries: libwebkit2gtk-4.1.so`
 
-运行依赖缺失。装系统依赖：
+运行依赖缺失，装一下：
 
 ```bash
 ./scripts/install.sh deps        # 自动检测发行版
-# 或手工：
+# 或者手工：
 sudo apt install -y libwebkit2gtk-4.1-0 librsvg2-2 libgtk-3-0 libayatana-appindicator3-1
 ```
 
@@ -179,7 +181,7 @@ Ubuntu 22.04 默认源只有 4.0；要么升级系统，要么用 AppImage（自
 构建时 zmq 头文件缺失：
 
 ```bash
-sudo apt install -y libzmq3-dev          # Debian/Ubuntu
+sudo apt install -y libzmq3-dev          # Debian / Ubuntu
 sudo dnf install -y zeromq-devel         # Fedora
 sudo pacman -S zeromq                    # Arch
 ```
@@ -205,7 +207,7 @@ APPIMAGE_EXTRACT_AND_RUN=1 ./btviz_0.1.0_amd64.AppImage
 
 ### 5.6 macOS / Windows
 
-当前 release 只覆盖 Linux x86_64。两端的构建步骤等价（装 Rust + Node + 系统 webview 依赖 → `npm run tauri:build`），但尚未在 CI 中验证。欢迎 PR。
+当前 release 只覆盖 Linux x86_64。两端的构建步骤等价（装 Rust + Node + 系统 webview 依赖 → `npm run tauri:build`），但还没在 CI 中验证。欢迎 PR。
 
 ---
 
@@ -257,7 +259,7 @@ git push origin v0.1.0
 ./scripts/install.sh uninstall
 ```
 
-或手工：
+或者手工：
 
 ```bash
 sudo rm /usr/local/bin/btviz
