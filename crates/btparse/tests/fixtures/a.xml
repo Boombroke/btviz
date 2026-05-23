@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="a">
+    <!-- 多场比赛永循环外壳:
+         外层 KeepRunningUntilFailure: child SUCCESS (一场赛跑完) -> resetChild + RUNNING -> 重启等下一场;
+                                       child FAILURE -> 整树 FAILURE 退出 (异常情况).
+
+         一场赛 = Sequence:
+           1) RetryUntilSuccessful + Delay(500ms): 等比赛开始, 限速避免 RetryNode 无限重 tick spam CPU
+              progress != 4 -> IsGameStatus FAILURE -> Delay 等 500ms -> RetryUntilSuccessful retry
+              progress == 4 -> IsGameStatus SUCCESS -> Delay SUCCESS -> RetryUntilSuccessful SUCCESS -> 推进
+           2) ReactiveFallback: 比赛中
+              首项 Inverter(IsGameStatus): progress 翻非 4 时 SUCCESS -> ReactiveFallback SUCCESS -> 一场赛 SUCCESS -> 外层 KeepRunning resetChild 重启等下一场
+              次项 KeepRunning(WhileDoElse 主决策): 比赛中持续 publish PubGoal -->
+    <KeepRunningUntilFailure>
+      <Sequence>
+        <RetryUntilSuccessful num_attempts="-1">
+          <Delay delay_msec="500">
+            <IsGameStatus max_remain_time="420"
+                          min_remain_time="0"
+                          expected_game_progress="4"
+                          key_port="{@referee_gameStatus}"/>
+          </Delay>
+        </RetryUntilSuccessful>
+        <ReactiveFallback>
+          <Inverter>
+            <IsGameStatus max_remain_time="420"
+                          min_remain_time="0"
+                          expected_game_progress="4"
+                          key_port="{@referee_gameStatus}"/>
+          </Inverter>
+          <KeepRunningUntilFailure>
+            <ReactiveSequence>
+              <IsGameStatus max_remain_time="420"
+                            min_remain_time="0"
+                            expected_game_progress="4"
+                            key_port="{@referee_gameStatus}"/>
+            <KeepRunningUntilFailure>
+              <WhileDoElse>
+                <IsStatusOK ammo_min="1"
+                            ammo_max="65535"
+                            hp_min="150"
+                            key_port="{@referee_robotStatus}"/>
+                <KeepRunningUntilFailure>
+                  <PubGoal topic_name="/goal_pose"
+                           goal_pose_x="3.71"
+                           goal_pose_y="-0.61"
+                           goal_pose_yaw="0.0"/>
+                </KeepRunningUntilFailure>
+                <WhileDoElse>
+                  <Inverter>
+                    <ReactiveSequence>
+                      <IsStatusOK ammo_min="50"
+                                  ammo_max="65535"
+                                  hp_min="0"
+                                  key_port="{@referee_robotStatus}"/>
+                      <IsStatusOK ammo_min="0"
+                                  ammo_max="65535"
+                                  hp_min="351"
+                                  key_port="{@referee_robotStatus}"/>
+                    </ReactiveSequence>
+                  </Inverter>
+                  <KeepRunningUntilFailure>
+                    <PubGoal topic_name="/goal_pose"
+                             goal_pose_x="-0.27"
+                             goal_pose_y="-3.94"
+                             goal_pose_yaw="0.0"/>
+                  </KeepRunningUntilFailure>
+                  <AlwaysSuccess/>
+                </WhileDoElse>
+              </WhileDoElse>
+            </KeepRunningUntilFailure>
+          </ReactiveSequence>
+        </KeepRunningUntilFailure>
+        </ReactiveFallback>
+      </Sequence>
+    </KeepRunningUntilFailure>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Condition ID="IsGameStatus"
+               editable="true">
+      <input_port name="max_remain_time"
+                  default="420">Maximum remaining time (s)</input_port>
+      <input_port name="min_remain_time"
+                  default="0">Minimum remaining time (s)</input_port>
+      <input_port name="expected_game_progress"
+                  default="4">Expected game progress stage</input_port>
+      <input_port name="key_port"
+                  default="{@referee_gameStatus}">GameStatus port on blackboard</input_port>
+    </Condition>
+    <Condition ID="IsStatusOK">
+      <input_port name="ammo_min"
+                  default="0"
+                  type="int">ammo &lt; ammo_min returns FAILURE</input_port>
+      <input_port name="ammo_max"
+                  default="65535"
+                  type="int">ammo &gt; ammo_max returns FAILURE</input_port>
+      <input_port name="hp_min"
+                  default="300"
+                  type="int">HP &lt; hp_min returns FAILURE</input_port>
+      <input_port name="key_port"
+                  default="{@referee_robotStatus}">RobotStatus port on blackboard</input_port>
+    </Condition>
+    <Action ID="PubGoal"
+            editable="true">
+      <input_port name="topic_name"
+                  default="/goal_pose">PoseStamped topic to publish</input_port>
+      <input_port name="goal_pose_x"/>
+      <input_port name="goal_pose_y"/>
+      <input_port name="goal_pose_yaw"
+                  default="0.0"
+                  type="float">目标航向 (rad)</input_port>
+    </Action>
+  </TreeNodesModel>
+
+</root>
