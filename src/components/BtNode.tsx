@@ -51,6 +51,7 @@ const BtNode: Component<Props> = (p) => {
 
   return (
     <g
+      data-bt-node
       transform={`translate(${p.node.x}, ${p.node.y})`}
       class="cursor-pointer"
       filter="url(#node-shadow)"
