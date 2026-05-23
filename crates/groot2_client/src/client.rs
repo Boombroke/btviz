@@ -32,7 +32,7 @@ use std::time::Duration;
 use byteorder::{ByteOrder, LittleEndian};
 use thiserror::Error;
 
-use crate::protocol::{ProtocolError, ReplyHeader, RequestHeader, RequestType, REPLY_HEADER_SIZE};
+use crate::protocol::{ProtocolError, ReplyHeader, RequestHeader, RequestType};
 
 #[derive(Debug, Error)]
 pub enum ClientError {

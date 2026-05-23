@@ -6,3 +6,9 @@ members = [
 ]
 resolver = "2"
 default-members = ["crates/btparse", "crates/groot2_client"]
+
+# Workspace-level release profile (Tauri-friendly: small binaries with LTO).
+[profile.release]
+strip = true
+opt-level = "s"
+lto = true
