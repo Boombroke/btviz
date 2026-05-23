@@ -1,10 +1,8 @@
 [workspace]
-<<<<<<< HEAD
-members = ["crates/btparse"]
-default-members = ["crates/btparse"]
+members = [
+    "crates/btparse",
+    "crates/groot2_client",
+    "src-tauri",
+]
 resolver = "2"
-=======
-members = ["crates/groot2_client"]
-resolver = "2"
-default-members = ["crates/groot2_client"]
->>>>>>> feat/groot2-protocol
+default-members = ["crates/btparse", "crates/groot2_client"]
