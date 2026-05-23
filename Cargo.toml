@@ -1,0 +1,4 @@
+[workspace]
+members = ["crates/groot2_client"]
+resolver = "2"
+default-members = ["crates/groot2_client"]
