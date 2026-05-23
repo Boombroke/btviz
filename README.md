@@ -17,7 +17,16 @@ Designed as a free alternative to [Groot2](https://www.behaviortree.dev/groot/),
 
 ## Install
 
-Pre-built bundles for Linux are produced by `npm run tauri:build`:
+One-shot installer (Ubuntu / Debian / Fedora / Arch auto-detected):
+
+```bash
+git clone https://github.com/Boombroke/btviz.git && cd btviz
+./scripts/install.sh           # deps + build + install to /usr/local/bin
+./scripts/install.sh bundle    # produce .deb / .rpm / .AppImage instead
+./scripts/install.sh help      # all subcommands
+```
+
+Pre-built bundles produced by `npm run tauri:build`:
 
 | Format | Path | Size |
 |---|---|---|
@@ -25,12 +34,14 @@ Pre-built bundles for Linux are produced by `npm run tauri:build`:
 | `.rpm` | `target/release/bundle/rpm/btviz-0.1.0-1.x86_64.rpm` | ~2 MB |
 | `.AppImage` | `target/release/bundle/appimage/btviz_0.1.0_amd64.AppImage` | ~75 MB |
 
-System dependencies (Debian / Ubuntu):
+Manual system deps (Debian / Ubuntu 24.04):
 
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev libssl-dev libgtk-3-dev \
-                 libayatana-appindicator3-dev librsvg2-dev
+                 libayatana-appindicator3-dev librsvg2-dev libzmq3-dev
 ```
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the full guide (offline install, AppImage troubleshooting, CI templates, uninstall).
 
 ## Build from source
 
