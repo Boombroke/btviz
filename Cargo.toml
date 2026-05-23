@@ -1,4 +1,10 @@
 [workspace]
+<<<<<<< HEAD
 members = ["crates/btparse"]
 default-members = ["crates/btparse"]
 resolver = "2"
+=======
+members = ["crates/groot2_client"]
+resolver = "2"
+default-members = ["crates/groot2_client"]
+>>>>>>> feat/groot2-protocol

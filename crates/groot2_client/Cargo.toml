@@ -1,0 +1,17 @@
+[package]
+name = "groot2_client"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Rust client for BT.CPP Groot2Publisher protocol (ZMQ REQ/REP, port 1667)"
+repository = "https://github.com/Boombroke/btviz"
+
+[dependencies]
+zmq = "0.10"
+thiserror = "1"
+byteorder = "1"
+
+[features]
+# Tests that require a live BT.CPP Groot2Publisher (port 1667) running.
+# Build/run with `cargo test --features live -- --ignored`.
+live = []
