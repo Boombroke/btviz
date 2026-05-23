@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Theme tokens. Dark default; light theme can override these by toggling
+   `class="light"` on <html>. Following Tailwind v4 @theme convention. */
+@theme {
+  --font-sans: "Inter", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", monospace;
+
+  /* Brand */
+  --color-brand-50: #f0f7ff;
+  --color-brand-400: #5eead4;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+
+  /* Surface */
+  --color-surface-0: #0a0a0c;
+  --color-surface-1: #111114;
+  --color-surface-2: #18181c;
+  --color-surface-3: #232328;
+
+  /* Node status palette */
+  --color-status-idle: #52525b;
+  --color-status-running: #14b8a6;
+  --color-status-success: #22c55e;
+  --color-status-failure: #ef4444;
+  --color-status-skipped: #a1a1aa;
+
+  /* Edges */
+  --color-edge: #3f3f46;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: radial-gradient(
+      ellipse at 20% -10%,
+      rgba(20, 184, 166, 0.06),
+      transparent 60%
+    ),
+    var(--color-surface-0);
+}
+
+/* Subtle dot grid for the canvas background. */
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Frosted glass surface (used on the sidebar). */
+.glass {
+  background: color-mix(in oklab, var(--color-surface-1) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in oklab, white 6%, transparent);
+}
+
+/* Soft elevation for floating chrome. */
+.shadow-floating {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 24px -12px rgba(0, 0, 0, 0.6),
+    0 24px 48px -24px rgba(0, 0, 0, 0.4);
+}
+
+/* Focus ring matching brand color. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Hide scrollbars in canvas areas while keeping scroll behavior. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
