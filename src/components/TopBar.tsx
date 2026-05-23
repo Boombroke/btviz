@@ -1,7 +1,24 @@
 import type { Component } from "solid-js";
-import { connection } from "@/stores/tree";
+import { createSignal, Show } from "solid-js";
+import {
+  connection,
+  connectServer,
+  disconnectServer,
+  openXmlDialog,
+} from "@/stores/tree";
 
 const TopBar: Component = () => {
+  const [showConnect, setShowConnect] = createSignal(false);
+  const [addr, setAddr] = createSignal("tcp://127.0.0.1:1667");
+
+  const onConnect = async () => {
+    setShowConnect(false);
+    await connectServer(addr());
+  };
+  const onDisconnect = async () => {
+    await disconnectServer();
+  };
+
   return (
     <header class="z-10 flex h-12 shrink-0 items-center gap-3 border-b border-white/5 bg-surface-1/80 px-4 backdrop-blur">
       <div class="flex items-center gap-2">
@@ -26,36 +43,59 @@ const TopBar: Component = () => {
       <div class="ml-4 flex items-center gap-2">
         <button
           type="button"
+          onClick={openXmlDialog}
           class="rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:border-white/10 hover:bg-white/10"
-          disabled
-          title="Wired in Day 1 integration"
         >
           Open File...
         </button>
-        <button
-          type="button"
-          class="rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:border-white/10 hover:bg-white/10"
-          disabled
-          title="Wired in Day 2 (groot2_client)"
+        <Show
+          when={connection.state === "connected"}
+          fallback={
+            <button
+              type="button"
+              onClick={() => setShowConnect((v) => !v)}
+              class="rounded-md border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-300 transition hover:border-brand-500/50 hover:bg-brand-500/20"
+            >
+              Connect
+            </button>
+          }
         >
-          Connect
-        </button>
+          <button
+            type="button"
+            onClick={onDisconnect}
+            class="rounded-md border border-white/5 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:border-white/10 hover:bg-white/10"
+          >
+            Disconnect
+          </button>
+        </Show>
+
+        <Show when={showConnect()}>
+          <div class="flex items-center gap-1">
+            <input
+              type="text"
+              value={addr()}
+              onInput={(e) => setAddr(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onConnect();
+                if (e.key === "Escape") setShowConnect(false);
+              }}
+              class="w-48 rounded-md border border-white/10 bg-surface-2 px-2 py-1 text-xs font-mono text-zinc-200 placeholder:text-zinc-500 focus:border-brand-500 focus:outline-none"
+              placeholder="tcp://127.0.0.1:1667"
+              autofocus
+            />
+            <button
+              type="button"
+              onClick={onConnect}
+              class="rounded-md bg-brand-500 px-2 py-1 text-xs font-semibold text-zinc-950 transition hover:bg-brand-400"
+            >
+              Go
+            </button>
+          </div>
+        </Show>
       </div>
 
       <div class="ml-auto flex items-center gap-3">
         <ConnectionPill />
-        <button
-          type="button"
-          class="rounded-md border border-white/5 bg-white/5 p-1.5 text-zinc-300 transition hover:border-white/10 hover:bg-white/10"
-          title="Toggle theme (Day 3)"
-          disabled
-          aria-label="Toggle theme"
-        >
-          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-          </svg>
-        </button>
       </div>
     </header>
   );
@@ -77,7 +117,7 @@ const ConnectionPill: Component = () => {
   return (
     <div class="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/5 px-2.5 py-1 text-[11px] text-zinc-300">
       <span class={`h-2 w-2 rounded-full transition-colors duration-200 ${dotClass()}`} />
-      <span class="font-mono">{connection.label}</span>
+      <span class="font-mono max-w-[200px] truncate">{connection.label}</span>
     </div>
   );
 };

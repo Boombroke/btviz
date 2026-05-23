@@ -1,0 +1,11 @@
+[package]
+name = "check-fulltree"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+btparse = { path = "../../crates/btparse" }
+groot2_client = { path = "../../crates/groot2_client" }
+
+[workspace]

@@ -1,17 +1,43 @@
 import type { Component } from "solid-js";
-import { For, Show } from "solid-js";
-import { tree } from "@/stores/tree";
+import { For, Show, createMemo } from "solid-js";
+import { tree, selection } from "@/stores/tree";
 import BtNode from "./BtNode";
 import BtEdge from "./BtEdge";
 
+const PADDING = 48;
+
 const Canvas: Component = () => {
+  /** Compute a viewBox that fits the whole tree with padding. */
+  const viewBox = createMemo(() => {
+    const ns = tree.nodes;
+    if (ns.length === 0) return "0 0 100 100";
+    let minX = Infinity,
+      minY = Infinity,
+      maxX = -Infinity,
+      maxY = -Infinity;
+    for (const n of ns) {
+      if (n.x < minX) minX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.x + n.w > maxX) maxX = n.x + n.w;
+      if (n.y + n.h > maxY) maxY = n.y + n.h;
+    }
+    const x = minX - PADDING;
+    const y = minY - PADDING;
+    const w = maxX - minX + PADDING * 2;
+    const h = maxY - minY + PADDING * 2;
+    return `${x} ${y} ${w} ${h}`;
+  });
+
   return (
     <section class="relative flex-1 overflow-hidden">
       <div class="dot-grid absolute inset-0" />
 
-      {/* SVG layer for the tree. Stays simple in the skeleton; pan/zoom and
-          motion transitions land in Day 3. */}
-      <svg class="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <svg
+        class="absolute inset-0 h-full w-full"
+        preserveAspectRatio="xMidYMid meet"
+        viewBox={viewBox()}
+        onClick={() => selection.set(null)}
+      >
         <defs>
           <linearGradient id="node-grad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
