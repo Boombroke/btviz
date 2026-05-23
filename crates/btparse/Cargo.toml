@@ -1,0 +1,12 @@
+[package]
+name = "btparse"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "BT.CPP 4.x XML parser + Reingold-Tilford layout for visualizers"
+
+[dependencies]
+quick-xml = "0.36"
+thiserror = "1"
+
+[dev-dependencies]

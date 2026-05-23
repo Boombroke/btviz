@@ -1,0 +1,4 @@
+[workspace]
+members = ["crates/btparse"]
+default-members = ["crates/btparse"]
+resolver = "2"
